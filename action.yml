@@ -1,0 +1,42 @@
+name: Honeycomb Marker Action
+description: Record a deploy marker in Honeycomb. Never fails the calling workflow.
+
+inputs:
+  api-key:
+    description: >
+      Honeycomb API key with the "Manage Markers" permission. Keys are scoped to a single
+      Honeycomb environment, so pass the key for the environment being deployed to.
+      When empty the action no-ops, so it is safe to add before the secret exists.
+    required: true
+  message:
+    description: Marker label shown on the chart, e.g. "suite a1b2c3d". Max 120 characters.
+    required: true
+  type:
+    description: Marker type. Markers sharing a type share a color in Honeycomb.
+    required: false
+    default: deploy
+  dataset:
+    description: >
+      Dataset slug to mark. Defaults to __all__, which makes the marker environment-wide.
+      A marker scoped to one dataset only renders on queries against that dataset, so it
+      will not appear on environment-wide boards.
+    required: false
+    default: __all__
+  url:
+    description: URL the marker links to. Defaults to the calling workflow run.
+    required: false
+    default: ''
+
+runs:
+  using: "composite"
+  steps:
+    - id: create-marker
+      env:
+        INPUT_API_KEY: ${{ inputs.api-key }}
+        INPUT_MESSAGE: ${{ inputs.message }}
+        INPUT_TYPE: ${{ inputs.type }}
+        INPUT_DATASET: ${{ inputs.dataset }}
+        INPUT_URL: ${{ inputs.url }}
+        DEFAULT_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      run: ${{ github.action_path }}/action.sh
+      shell: bash

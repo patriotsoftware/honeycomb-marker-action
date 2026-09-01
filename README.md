@@ -20,6 +20,28 @@ deploys show as vertical lines on latency and error charts.
 | `type` | no | `deploy` | Markers sharing a type share a color. |
 | `dataset` | no | `__all__` | Dataset to mark. `__all__` is environment-wide. |
 | `url` | no | the workflow run | URL the marker links to. |
+| `start-time` | no | — | Unix seconds the deploy began. Draws a range instead of a point. |
+| `end-time` | no | now | Unix seconds the deploy ended. |
+
+## Marking a deploy as a range
+
+Capture the time before deploying and pass it as `start-time`; `end-time` defaults to now.
+Honeycomb draws a shaded band, so you can see whether a change happened during the rollout
+or after it settled.
+
+```yaml
+- id: t0
+  run: echo "start=$(date +%s)" >> $GITHUB_OUTPUT
+
+- name: Deploy
+  ...
+
+- uses: patriotsoftware/honeycomb-marker-action@v1
+  with:
+    api-key: ${{ secrets.HONEYCOMB_MARKER_API_KEY_DEV }}
+    message: suite ${{ github.sha }}
+    start-time: ${{ steps.t0.outputs.start }}
+```
 
 ## The API key
 

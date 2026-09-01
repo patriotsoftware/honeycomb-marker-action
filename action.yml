@@ -26,6 +26,16 @@ inputs:
     description: URL the marker links to. Defaults to the calling workflow run.
     required: false
     default: ''
+  start-time:
+    description: >
+      Unix seconds the deploy began. Set it to draw the marker as a range instead of a
+      point. Ignored unless it is an integer.
+    required: false
+    default: ''
+  end-time:
+    description: Unix seconds the deploy ended. Defaults to now when start-time is set.
+    required: false
+    default: ''
 
 runs:
   using: "composite"
@@ -37,6 +47,8 @@ runs:
         INPUT_TYPE: ${{ inputs.type }}
         INPUT_DATASET: ${{ inputs.dataset }}
         INPUT_URL: ${{ inputs.url }}
+        INPUT_START_TIME: ${{ inputs.start-time }}
+        INPUT_END_TIME: ${{ inputs.end-time }}
         DEFAULT_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
       run: ${{ github.action_path }}/action.sh
       shell: bash
